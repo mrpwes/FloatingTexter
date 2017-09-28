@@ -26,7 +26,7 @@ class Main extends PluginBase{
         $this->getLogger()->info(TextFormat::RED . "FloatingTexter by Fycarman disabled.");
     }
 
-    public function onCommand(CommandSender $sender, Command $command, $label, array $args){
+    public function onCommand(CommandSender $sender, Command $command, string $label, array $args) : bool{
         if($sender instanceof Player){
             if($sender->hasPermission("floatingtexter.use")){
                 if(isset($args[0])){
@@ -63,11 +63,31 @@ class Main extends PluginBase{
                                 $sender->sendMessage(TextFormat::YELLOW . "Usage: /floatingtexter remove <id>");
                             }
                             break;
+                        case "edit":
+                            if(isset($args[0]) and is_numeric($args[0])){
+                                $text = implode(" ", $args);
+                                $floatingText = $sender->getLevel()->getEntity($args[0]);
+                                if($floatingText instanceof FloatingText){
+                                    if(trim($text, " ") !== ""){
+                                        $floatingText->setText($text);
+                                        $floatingText->respawn();
+                                        $sender->sendMessage(TextFormat::RED . "FloatingText successfully updated!");
+                                    }else{
+                                        $sender->sendMessage(TextFormat::RED . "Please input a valid text.");
+                                    }
+                                }else{
+                                    $sender->sendMessage(TextFormat::RED . "The specified entity id is not a FloatingText!");
+                                }
+                            }else{
+                                $sender->sendMessage(TextFormat::YELLOW . "Usage: /floatingtexter edit <id> <text>");
+                            }
+                            break;
                         default:
-                            $sender->sendMessage(TextFormat::YELLOW . "Usage: /floatingtexter <add|remove> <text|id>");
+                            $sender->sendMessage(TextFormat::YELLOW . "Usage: /floatingtexter <add|remove|edit> <text|id>");
                     }
                 }
             }
         }
+        return true;
     }
 }
